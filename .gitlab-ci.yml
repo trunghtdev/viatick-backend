@@ -1,0 +1,83 @@
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+variables:
+  APP_SERVICE: 'emn'
+  USER: 'deploy'
+  SERVER_PRODUCTION6: '192.168.88.146'
+
+before_script:
+  - export PATH=$PATH:/home/gitlab-runner/.nvm/versions/node/v12.10.0/bin/
+
+stages:
+  - buildTest
+  - buildBeta
+  - deployTest
+  - deployBeta
+
+buildTest:
+  stage: buildTest
+  only:
+    refs:
+      - /test/
+      - cicd
+  script:
+    - pwd
+    - ls /home/gitlab-runner/.nvm/versions/node/
+    - node -v
+    - echo ${SERVER_PRODUCTION6}
+
+    - npm i
+    - npm audit fix
+    - npm run gen
+    - npm run build
+
+    - rsync -a -e "ssh -p 22" . ${USER}@${SERVER_PRODUCTION6}:/opt/backend_test/${APP_SERVICE} --delete
+
+buildBeta:
+  stage: buildBeta
+  only:
+    refs:
+      - master
+  script:
+    - pwd
+    - ls /home/gitlab-runner/.nvm/versions/node/
+    - node -v
+    - echo ${SERVER_PRODUCTION6}
+
+    - npm i
+    - npm audit fix
+    - npm run gen
+    - npm run build
+
+    - rsync -a -e "ssh -p 22" . ${USER}@${SERVER_PRODUCTION6}:/opt/backend_beta/${APP_SERVICE} --delete
+
+deployTest:
+  stage: deployTest
+  only:
+    refs:
+      - /test/
+      - cicd
+  variables:
+    APP_PORT: 9562
+    APP_NAME: 'emn_test'
+    APP_DB: 'emn_test'
+  script:
+    - ssh -p 22 ${USER}@${SERVER_PRODUCTION6} "/home/deploy/scripts/${APP_SERVICE}/pm2InitService.sh -s ${APP_SERVICE} -p ${APP_PORT} -d ${APP_DB} --stage test"
+    - ssh -p 22 ${USER}@${SERVER_PRODUCTION6} "/home/deploy/scripts/${APP_SERVICE}/${APP_DB}${APP_PORT}${APP_SERVICE}.sh"
+
+deployBeta:
+  stage: deployBeta
+  only:
+    refs:
+      - master
+  variables:
+    APP_PORT: 9582
+    APP_NAME: 'emn_beta'
+    APP_DB: 'emn_beta'
+  script:
+    - ssh -p 22 ${USER}@${SERVER_PRODUCTION6} "/home/deploy/scripts/${APP_SERVICE}/pm2InitService.sh -s ${APP_SERVICE} -p ${APP_PORT} -d ${APP_DB} --stage beta"
+    - ssh -p 22 ${USER}@${SERVER_PRODUCTION6} "/home/deploy/scripts/${APP_SERVICE}/${APP_DB}${APP_PORT}${APP_SERVICE}.sh"
+

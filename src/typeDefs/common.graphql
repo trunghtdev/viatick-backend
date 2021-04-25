@@ -1,0 +1,25 @@
+type CreatedBy {
+  _id: ID
+  firstname: String
+  lastname: String
+  phonenumber: String
+  email: String
+}
+
+type UpdatedBy {
+  _id: ID
+  firstname: String
+  lastname: String
+  phonenumber: String
+  email: String
+}
+
+type RangeTime {
+  from: Float!
+  to: Float!
+}
+
+input InputRangeTime {
+  from: Float!
+  to: Float!
+}

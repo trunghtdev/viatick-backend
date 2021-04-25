@@ -1,0 +1,55 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@src/*": [
+        "./*"
+      ],
+      "@typeDefs/*": [
+        "./typeDefs/*"
+      ],
+      "@configs/*": [
+        "./configs/*"
+      ],
+      "@constants": [
+        "./constants"
+      ],
+      "@services": [
+        "./services"
+      ],
+      "@resolvers": [
+        "./resolvers"
+      ],
+      "@strategies": [
+        "./strategies"
+      ],
+      "@guards": [
+        "./guards"
+      ],
+      "@decorators": [
+        "./decorators"
+      ],
+      "@types": [
+        "./types"
+      ],
+      "@interceptors": [
+        "./interceptors"
+      ],
+      "@modules": [
+        "./modules"
+      ],
+      "@graphql": [
+        "./modules/graphql"
+      ],
+      "@entities": [
+        "./entities"
+      ],
+      "@utils": [
+        "./utils"
+      ],
+      "@dbseed": [
+        "./dbseed"
+      ]
+    }
+  }
+}

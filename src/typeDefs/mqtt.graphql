@@ -1,0 +1,53 @@
+type Mutation {
+  mqttPublish(request: MqttRequest!): Boolean
+}
+
+input MqttRequest {
+  topic: String!
+  id: String
+  data: MqttRequestData
+  from: String
+  to: String
+  type: String
+  command: String  
+}
+
+input MqttRequestData {
+  value: String
+  mac: String
+  name: String
+  version: String
+  type: String
+  factory: String
+  model: String
+  color: [String]
+  network: Int
+  endpoint: Int
+  fieldInputClusters: Boolean
+  fieldOutputClusters: Boolean
+}
+
+type MqttResponse {
+  topic: String
+  id: String
+  data: MqttResponseData
+  from: String
+  to: String
+  type: String
+  command: String
+}
+
+type MqttResponseData {
+  value: String
+  mac: String
+  name: String
+  version: String
+  type: String
+  factory: String
+  model: String
+  color: [String]
+  network: Int
+  endpoint: Int
+  fieldInputClusters: Boolean
+  fieldOutputClusters: Boolean
+}

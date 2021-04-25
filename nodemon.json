@@ -1,0 +1,14 @@
+{
+  "watch": [
+    "src"
+  ],
+  "ext": "ts",
+  "ignore": [
+    "src/**/*.spec.ts",
+    "src/**/*.schema.ts"
+  ],
+  "events": {
+    "start": "node -e  process.platform==\"win32\"&&cls; process.platform==\"win32\"&&echo ❖ - Starting in dev mode...",
+    "start-linux": "node -e 'console.clear(); console.log(`❖ - Starting in dev mode...`)'"   
+  }
+}

@@ -1,0 +1,89 @@
+type Query {
+  findOneUser(userId: ID):                    TypeUser
+  findAuthenUser: TypeUser
+  findManyUser(inputUser: UpdateUserInput):   [TypeUser]
+  aggregateUser(idUser: String, inputUser: UpdateUserInput):  [User]
+}
+
+type Mutation {
+	login(loginInput: LoginInput!):                       LoginResponse!
+  createOneUser(newUser: NewUserInput!):               		  ID
+  updateOneUser(userId: ID!, update: UpdateUserInput!):    Boolean
+  updateProfile(update: UpdateUserInput!): Boolean
+  deleteOneUser(userId: ID):                                Boolean
+  deleteManyUser(userIds: [ID]):                           Boolean
+  sendCodeForgotPassword(email: String!): ResetPasswordResponse
+  resetPassword(userId: ID!, password: String!):    Boolean
+}
+
+type User {
+  _id:            ID
+  # role:           ID
+  firstname:      String
+  lastname:       String
+  email:          String
+	phonenumber:    String
+
+  isVerified:     Boolean
+  isLocked:				Boolean
+  isActive: Boolean
+  
+  avatar: String
+  
+  createdAt:      Float
+  updatedAt: Float
+  createdBy: CreatedBy
+  updatedBy: UpdatedBy
+}
+
+type TypeUser {
+  _id:            ID
+  idRole:           ID
+  firstname:      String
+  lastname:       String
+  email:          String
+	phonenumber:    String
+  
+  isVerified:     Boolean
+  isLocked:				Boolean
+  isActive: Boolean
+  avatar: String
+  
+  createdAt:      Float
+  createdBy:      ID
+  updatedAt:      Float
+  updatedBy:      ID
+}
+
+input LoginInput {
+	account:       String
+	password:       String
+}
+
+type LoginResponse {
+	token:          String
+}
+type ResetPasswordResponse {
+	userId:          String
+  code: String
+}
+input NewUserInput {
+  password:       String!
+  email:          String
+  phonenumber:    String
+  idRole:    String
+  avatar: String
+}
+
+input UpdateUserInput {
+  password:       String
+  firstname:      String
+  lastname:       String
+  email:          String
+  phonenumber:    String
+  idRole:         String
+  avatar: String
+  isActive: Boolean
+  isLocked: Boolean
+  isVerified: Boolean
+}

@@ -12,16 +12,16 @@ export class EntityDevice {
   deviceId: number
 
   @Column()
-  @IsString()
-  application: string
+  @IsNumber()
+  application: number
 
   @Column()
   @IsString()
   name: string
 
   @Column()
-  @IsString()
-  model: string
+  @IsNumber()
+  model: number
 
   @Column()
   @IsString()
@@ -61,7 +61,7 @@ export class EntityDevice {
 
   @Column()
   @IsBoolean()
-  active: Boolean
+  active: boolean
 
   @Column()
   @IsNumber()
@@ -104,7 +104,7 @@ export class EntityDevice {
   z: number
 
   @Column()
-  tags: [string]
+  tags: string[]
 
   @Column()
   @IsNumber()

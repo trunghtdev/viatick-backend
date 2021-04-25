@@ -5,7 +5,7 @@ type Query {
 type Mutation {
   updateDevice(input: DeviceUpdateInput): TDevice
   deleteDevices(type: String, deviceIds: [Int]): DeleteDeviceResponse
-  
+  createDevice(input: DeviceCreateInput!): ID!
 }
 
 type DeleteDeviceResponse {

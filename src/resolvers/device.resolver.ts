@@ -8,6 +8,7 @@ import { _appConfigs } from '@constants'
 import { Public } from '@decorators'
 
 import {
+  DeviceCreateInput,
   DeviceUpdateInput,
   FilterDevice
 } from '@typeDefs/index.schema'
@@ -22,6 +23,15 @@ export class DeviceResolvers {
   async getSensorsWithIOT(filter: FilterDevice): Promise<any> {
     try {
       return await this.deviceService.getSensorsWithIOT(filter)
+    } catch (err) {
+      throw err
+    }
+  }
+
+  @Mutation('createDevice')
+  async createDevice(input: DeviceCreateInput): Promise<string> {
+    try {
+      return (await this.deviceService.createDevice(input))._id
     } catch (err) {
       throw err
     }

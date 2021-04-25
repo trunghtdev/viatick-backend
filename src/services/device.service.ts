@@ -6,16 +6,19 @@ import {
   LoginResponse,
   User as UserGQLType,
   FilterDevice,
-  DeviceUpdateInput
+  DeviceUpdateInput,
+  DeviceCreateInput,
+  TDevice
 } from '@typeDefs/index.schema'
 import { ResolverClass } from '@src/utils'
 import { User as UserEntity, EntityDevice } from '@src/entities'
 import { AuthenticationService } from './auth.service'
 import { Injectable } from '@nestjs/common'
+import { TokenData } from '@src/types'
 
 @Injectable()
 export class DeviceService extends ResolverClass {
-  async getSensorsWithIOT(filter: FilterDevice): Promise<any> {
+  async getSensorsWithIOT(filter: FilterDevice): Promise<TDevice[]> {
     try {
       const condQuery: object[] = []
       if (filter !== undefined) {
@@ -75,12 +78,36 @@ export class DeviceService extends ResolverClass {
         where: { $and: condQuery }
       }
       )
-      return devices
+      return devices.map(d => ({
+        ...d,
+        application: {
+          applicationId: d.application
+        },
+        model: {
+          modelId: d.model,
+          type: "",
+          name: ""
+        }
+      }))
     } catch (err) {
       throw this.err.Apollo(err)
     }
   }
-  async updateDevice(input: DeviceUpdateInput): Promise<any> {
+
+  async createDevice(input: DeviceCreateInput): Promise<EntityDevice> {
+    try {
+      const device = await this.mongoManager.save(
+        new EntityDevice({
+          ...input
+        })
+      )
+      return device
+    } catch (err) {
+      throw this.err.Apollo(err)
+    }
+  }
+
+  async updateDevice(input: DeviceUpdateInput): Promise<TDevice> {
     try {
       const updatedDevice = Object.assign({}, input)
       delete updatedDevice.deviceId
@@ -92,12 +119,22 @@ export class DeviceService extends ResolverClass {
         ...updatedDevice
       })
 
-      return devcie
+      return {
+        ...devcie.value,
+        application: {
+          applicationId: devcie.value.application
+        },
+        model: {
+          modelId: devcie.value.model,
+          type: "",
+          name: ""
+        }
+      }
     } catch (err) {
       throw this.err.Apollo(err)
     }
   }
-  async deleteDevices(type: string, deviceIds: number[]): Promise<any> {
+  async deleteDevices(type: string, deviceIds: number[]): Promise<number> {
     try {
       switch (type) {
         case 'Sensor':

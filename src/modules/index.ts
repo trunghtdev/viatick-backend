@@ -11,8 +11,10 @@ import { UserModule } from './user.module'
 import { MqttModule } from './mqtt.module'
 import { AuthenticationModule } from './auth.module'
 import { TasksModule } from './tasks.module'
+import { DeviceModule } from './device.module'
 
 export default [
+  DeviceModule,
   TasksModule,
   AuthenticationModule,
   MqttModule,

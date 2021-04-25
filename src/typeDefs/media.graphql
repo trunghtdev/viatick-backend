@@ -1,0 +1,14 @@
+type Media {
+# Id of the media
+mediaId: Int!
+# Name of the media file
+name: String
+# Type of the media file
+type: String
+# Size of the media file
+size: Int
+# URL of the media file
+url: String!
+# Creation date of the media file
+date: AWSDateTime
+}

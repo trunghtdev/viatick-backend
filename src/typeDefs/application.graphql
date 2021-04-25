@@ -1,0 +1,28 @@
+type Application {
+# Id of the application
+applicationId: Int
+# Name of the application
+name: String
+# API Key to retrieve access token to use the APIs
+apiKey: String
+# Hash of the API Key, to be used as storing and retrieval key for Tracking APIs
+apiKeyHash: String
+# SDK Key of the application
+sdkKey: String
+# Configuration of the application (deprecated)
+configuration: AWSJSON @deprecated( reason: "Relevant configurations are now stored on other parameters" )
+# Remark of the application
+remark: String
+# Creation date of the application
+date: AWSDateTime
+# Check-in interval of the application (for inversed attendance feature)
+checkInInterval: Int
+# Check-out interval of the application (for inversed attendance feature)
+checkOutInterval: Int
+# Whether inversed attendance is enabled for this account
+inversedAttendance: Boolean
+# Id of the master key to generate API subkeys
+apiMasterKeyId: String
+# Id of the master key to generate SDK subkeys
+sdkMasterKeyId: String
+}

@@ -1,0 +1,108 @@
+type Query {
+  getSensorsWithIOT(filter: FilterDevice) : [TDevice]
+}
+
+type Mutation {
+  updateDevice(input: DeviceUpdateInput): TDevice
+  deleteDevices(type: String, deviceIds: [Int]): DeleteDeviceResponse
+  
+}
+
+type DeleteDeviceResponse {
+   rows_deleted: Int
+}
+
+input FilterDevice {
+  name: String,
+  model: Int,
+  serial: String,
+  mac: String,
+  region: String,
+  longitude: Float,
+  latitude: Float,
+  floor: Int,
+  distance: Float,
+  remark: String,
+  optional: AWSJSON,
+  active: Boolean,
+  date: AWSDateTime
+}
+
+input DeviceCreateInput {
+  application: Int
+  name: String
+  model: Int
+  serial: String
+  mac: String
+  region: String
+  longitude: Float
+  latitude: Float
+  floor: Int
+  distance: Float
+  remark: String
+  optional: AWSJSON
+  active: Boolean
+  x: Float
+  y: Float
+  z: Float
+  tags: [String]
+}
+
+input DeviceUpdateInput {
+  deviceId: Int
+  application: Int
+  name: String
+  model: Int
+  serial: String
+  mac: String
+  region: String
+  longitude: Float
+  latitude: Float
+  floor: Int
+  distance: Float
+  remark: String
+  optional: AWSJSON
+  active: Boolean
+  x: Float
+  y: Float
+  z: Float
+  tags: [String]
+}
+
+type TDevice {
+  deviceId: Int
+  application: Application
+  name: String
+  model: BLEModel
+  serial: String
+  mac: String
+  region: String
+  longitude: Float
+  latitude: Float
+  floor: Int
+  distance: Float
+  remark: String
+  optional: AWSJSON
+  active: Boolean
+  date: AWSDateTime
+  live: AWSDateTime
+  battery: Int
+  humidity: Int
+  temperature: Int
+  height: Int
+  maxHeight: Int
+  x: Float
+  y: Float
+  z: Float
+  tags: [String]
+  deploymentDate: AWSDateTime
+  compositionData: AWSJSON
+  unicastAddr: String
+  meshStatus: AWSJSON
+  status: String
+  error: String
+  lockStatus: String
+  network: String
+  frequency: Int
+  server: String
+}

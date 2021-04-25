@@ -1,0 +1,16 @@
+type BLEModel {
+# Id of the BLE model
+modelId: Int
+# Name of the BLE model
+name: String!
+# Device type of the BLE model
+type: String!
+# Displayed image of the BLE model
+image: Media
+# Distance range of the BLE model
+distance: Float @deprecated( reason: "Not used anymore" )
+# Remark of the BLE model
+remark: String
+# Creation date of the BLE model
+date: AWSDateTime
+}

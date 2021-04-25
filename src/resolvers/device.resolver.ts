@@ -8,6 +8,7 @@ import { _appConfigs } from '@constants'
 import { Public } from '@decorators'
 
 import {
+  DeleteDeviceResponse,
   DeviceCreateInput,
   DeviceUpdateInput,
   FilterDevice
@@ -20,7 +21,7 @@ import { UserInputError, ApolloError } from 'apollo-server-fastify'
 export class DeviceResolvers {
   constructor(private readonly deviceService: DeviceService) { }
   @Query('getSensorsWithIOT')
-  async getSensorsWithIOT(filter: FilterDevice): Promise<any> {
+  async getSensorsWithIOT(@Args('filter') filter: FilterDevice): Promise<any> {
     try {
       return await this.deviceService.getSensorsWithIOT(filter)
     } catch (err) {
@@ -29,7 +30,7 @@ export class DeviceResolvers {
   }
 
   @Mutation('createDevice')
-  async createDevice(input: DeviceCreateInput): Promise<string> {
+  async createDevice(@Args('input') input: DeviceCreateInput): Promise<string> {
     try {
       return (await this.deviceService.createDevice(input))._id
     } catch (err) {
@@ -38,7 +39,7 @@ export class DeviceResolvers {
   }
 
   @Mutation('updateDevice')
-  async updateDevice(input: DeviceUpdateInput): Promise<any> {
+  async updateDevice(@Args('input') input: DeviceUpdateInput): Promise<any> {
     try {
       return await this.deviceService.updateDevice(input)
     } catch (err) {
@@ -47,9 +48,14 @@ export class DeviceResolvers {
   }
 
   @Mutation('deleteDevices')
-  async deleteDevices(type: string, deviceIds: number[]): Promise<any> {
+  async deleteDevices(
+    @Args('deviceIds') deviceIds: number[],
+    @Args('type') type?: string
+  ): Promise<DeleteDeviceResponse> {
     try {
-      return await this.deviceService.deleteDevices(type, deviceIds)
+      return {
+        rows_deleted: await this.deviceService.deleteDevices(deviceIds, type)
+      }
     } catch (err) {
       throw err
     }

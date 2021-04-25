@@ -3,8 +3,8 @@ type Query {
 }
 
 type Mutation {
-  updateDevice(input: DeviceUpdateInput): TDevice
-  deleteDevices(type: String, deviceIds: [Int]): DeleteDeviceResponse
+  updateDevice(input: DeviceUpdateInput!): TDevice
+  deleteDevices(deviceIds: [Int]!,type: String): DeleteDeviceResponse
   createDevice(input: DeviceCreateInput!): ID!
 }
 

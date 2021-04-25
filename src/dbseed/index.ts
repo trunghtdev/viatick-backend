@@ -1,11 +1,6 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common'
 import { MongoClient } from 'mongodb'
-import { permissions, detailPermission } from './permissions'
-import { rolePermissions } from './rolePermission'
-import { cluster } from './cluster'
-import { typeArea } from './typeArea'
-import { deviceType } from './deviceType'
-import { attributes } from './attribute'
+import { devices } from './device'
 import { v1 as uuidV1 } from 'uuid'
 @Injectable()
 export class DbService implements OnApplicationBootstrap {
@@ -22,89 +17,8 @@ export class DbService implements OnApplicationBootstrap {
     })
     await client.connect()
     const db = client.db(dbName)
-
+    // User
     try {
-      // attributes
-      try {
-        const _attributes = attributes.map(a => {
-          const { name } = a
-          const _id = uuidV1({ clockseq: parseInt("0x" + a.code, 16) })
-          const code = _id.split('-')[3]
-          return db.collection('attribute').findOneAndUpdate(
-            { _id: code },
-            {
-              $setOnInsert: {
-                _id: code
-              },
-              $set: {
-                code: a.code,
-                name,
-                isActive: true,
-                createdAt: +new Date()
-              }
-            },
-            { upsert: true }
-          )
-        })
-        await Promise.all(_attributes)
-        console.log('🌱  Done for attributes')
-      } catch (error) {
-        console.log('❌  Error on attributes', error)
-      }
-      // type area
-      try {
-        const typesArea = typeArea.map(typearea => {
-          const { code, name } = typearea
-          return db.collection('types_area').findOneAndUpdate(
-            { code },
-            {
-              $setOnInsert: {
-                _id: code
-              },
-              $set: {
-                code,
-                name,
-                isActive: true,
-                createdAt: +new Date()
-              }
-            },
-            { upsert: true }
-          )
-        })
-        await Promise.all(typesArea)
-        console.log('🌱  Done for type areas')
-      } catch (error) {
-        console.log('❌  Error on type areas', error)
-      }
-
-      // type device
-      try {
-        const typesDevice = deviceType.map(typedevice => {
-          const { _id, code, name, icon } = typedevice
-          return db.collection('device_type').findOneAndUpdate(
-            { code },
-            {
-              $setOnInsert: {
-                _id
-              },
-              $set: {
-                code,
-                name,
-                icon,
-                isActive: true,
-                createdAt: +new Date()
-              }
-            },
-            { upsert: true }
-          )
-        })
-        await Promise.all(typesDevice)
-        console.log('🌱  types device')
-      } catch (error) {
-        console.log('❌  Error on types device', error)
-      }
-
-      // User
       const salt = require('bcrypt').genSaltSync(10)
       const users = [
         {
@@ -191,168 +105,50 @@ export class DbService implements OnApplicationBootstrap {
       } catch (error) {
         console.log('❌  Error on users', error)
       }
-
-      // Roles
-      const roles = [
-        {
-          _id: 'SUPER_ADMIN',
-          code: 'SUPER_ADMIN',
-          name: 'SuperAdmin'
-        },
-        {
-          _id: 'ADMIN',
-          code: 'ADMIN',
-          name: 'Admin'
-        },
-        {
-          _id: 'CLIENT',
-          code: 'CLIENT',
-          name: 'CLIENT'
-        }
-      ]
+      // devices
       try {
-        const rolesPromises = roles.map(role => {
-          const { _id, code, name } = role
-          return db.collection('roles').findOneAndUpdate(
-            { _id },
+        const devicesPromises = devices.map(device => {
+          const {
+            deviceId,
+            application,
+            name,
+            model,
+            serial,
+            mac,
+            region,
+            longitude,
+            latitude,
+            floor,
+            active,
+            distance
+          } = device
+          return db.collection('devices').findOneAndUpdate(
+            { deviceId },
             {
               $setOnInsert: {
-                _id
+                deviceId
               },
               $set: {
-                code,
+                application,
                 name,
-                description: '',
-                isActive: true
+                model,
+                serial,
+                mac,
+                region,
+                longitude,
+                latitude,
+                floor,
+                distance,
+                active
               }
             },
             { upsert: true }
           )
         })
-        await Promise.all(rolesPromises)
-        console.log('🌱  Done for roles')
+        await Promise.all(devicesPromises)
+        console.log('🌱  Done for devices')
       } catch (error) {
-        console.log('❌  Error on roles', error)
-      }
-
-      // Permission
-      try {
-        const permissionsPromises = permissions.map(permission => {
-          const { _id, code, name } = permission
-          return db.collection('permissions').findOneAndUpdate(
-            { _id },
-            {
-              $setOnInsert: {
-                _id
-              },
-              $set: {
-                code,
-                name,
-                description: '',
-                isActive: true
-              }
-            },
-            { upsert: true }
-          )
-        })
-        const permissionsDetailsPromises = detailPermission.map(permission => {
-          const { _id, code, name } = permission
-          return db.collection('permissions').findOneAndUpdate(
-            { _id },
-            {
-              $setOnInsert: {
-                _id
-              },
-              $set: {
-                code,
-                name,
-                description: '',
-                isActive: true
-              }
-            },
-            { upsert: true }
-          )
-        })
-        await Promise.all(
-          permissionsPromises.concat(permissionsDetailsPromises)
-        )
-        console.log('🌱  Done for permissions')
-      } catch (error) {
-        console.log('❌  Error on permissions', error)
-      }
-
-      // Role permission
-      try {
-        const rolePermissionPromises = []
-        for (const [role, permissionOfRoles] of Object.entries(
-          rolePermissions
-        )) {
-          let permissionCodes = []
-          if (role === 'SUPER_ADMIN') {
-            permissionCodes = permissions.map(per => per.code)
-          } else {
-            permissionCodes = permissionOfRoles
-          }
-          permissionCodes.forEach(permissionCode => {
-            const foundRole = roles.find(rol => rol.code === role)
-            const foundPermission = permissions.find(
-              per => per.code === permissionCode
-            )
-            rolePermissionPromises.push(
-              db.collection('roles_permissions').findOneAndUpdate(
-                {
-                  '_id.idRole': foundRole._id,
-                  '_id.idPermission': foundPermission._id
-                },
-                {
-                  // $setOnInsert: {
-                  //   _id: {
-                  //     roleId: foundRole._id,
-                  //     permissionId: foundPermission._id
-                  //   }
-                  // },
-                  $set: {
-                    isActive: true,
-                    typeValue: 'none',
-                    value: ''
-                  }
-                },
-                { upsert: true }
-              )
-            )
-          })
-        }
-        await Promise.all(rolePermissionPromises)
-        console.log('🌱  Done for roles_permissions')
-      } catch (error) {
-        console.log('❌  Error on roles_permissions', error)
-      }
-
-      // Cluster
-      try {
-        const clusters = cluster.map(cluster => {
-          const { code, name, desc } = cluster
-          return db.collection('clusters').findOneAndUpdate(
-            { code },
-            {
-              $setOnInsert: {
-                _id: code
-              },
-              $set: {
-                code,
-                name,
-                desc,
-                isActive: true,
-                createAt: +new Date()
-              }
-            },
-            { upsert: true }
-          )
-        })
-        await Promise.all(clusters)
-        console.log('🌱  Done for cluster')
-      } catch (error) {
-        console.log('❌  Error on cluster', error)
+        console.log('❌  Error on devices', error)
       }
       console.log('Seeding Done')
     } catch (error) {

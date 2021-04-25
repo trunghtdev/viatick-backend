@@ -72,7 +72,7 @@ export class DeviceService extends ResolverClass {
           active: true
         })
       }
-
+      console.log({ condQuery })
       const devices = await this.mongoManager.find(
         EntityDevice, {
         where: { $and: condQuery }
@@ -112,20 +112,22 @@ export class DeviceService extends ResolverClass {
       const updatedDevice = Object.assign({}, input)
       delete updatedDevice.deviceId
 
-      const devcie = await this.mongoManager.findOneAndUpdate(
+      const device = await this.mongoManager.findOneAndUpdate(
         EntityDevice, {
-        _id: input.deviceId
+        deviceId: input.deviceId
       }, {
-        ...updatedDevice
+        $set: {
+          ...updatedDevice
+        }
       })
-
       return {
-        ...devcie.value,
+        ...device.value,
+        ...(device.ok ? updatedDevice : {}),
         application: {
-          applicationId: devcie.value.application
+          applicationId: device.value.application
         },
         model: {
-          modelId: devcie.value.model,
+          modelId: device.value.model,
           type: "",
           name: ""
         }
@@ -134,19 +136,15 @@ export class DeviceService extends ResolverClass {
       throw this.err.Apollo(err)
     }
   }
-  async deleteDevices(type: string, deviceIds: number[]): Promise<number> {
+  async deleteDevices(deviceIds: number[], type?: string): Promise<number> {
     try {
-      switch (type) {
-        case 'Sensor':
-          const { deletedCount } = await this.mongoManager.deleteMany(
-            EntityDevice, {
-            _id: { $in: deviceIds }
-          }
-          )
-          return deletedCount
-        default:
-          break;
+      console.log({ deviceIds })
+      const { deletedCount } = await this.mongoManager.deleteMany(
+        EntityDevice, {
+        deviceId: { $in: deviceIds }
       }
+      )
+      return deletedCount
     } catch (err) {
       throw this.err.Apollo(err)
     }
